@@ -13,6 +13,8 @@ services:
   #       tag: httpd.access
   golang:
     build: .
+    volumes:
+      - .:/go/src/project
     links:
       - fluentd
     logging:
@@ -21,8 +23,10 @@ services:
         fluentd-address: localhost:24224
         tag: golang.app
     ports:
-      - "8080:8080"
-    command: "reflex reflex.conf"
+      - "1324:1324"
+    tty: yes
+    # command: "reflex reflex.conf"
+    # command: "go run main.go"
 
   fluentd:
     build: ./fluentd

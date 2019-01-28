@@ -1,0 +1,49 @@
+version: "2"
+services:
+  # web:
+  #   image: httpd
+  #   ports:
+  #     - "80:80"
+  #   links:
+  #     - fluentd
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-address: localhost:24224
+  #       tag: httpd.access
+  golang:
+    build: .
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: golang.app
+    ports:
+      - "8080:8080"
+    command: "reflex reflex.conf"
+
+  fluentd:
+    build: ./fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    links:
+      - "elasticsearch"
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+
+  elasticsearch:
+    image: elasticsearch:6.5.4
+    expose:
+      - 9200
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: kibana:6.5.4
+    links:
+      - "elasticsearch"
+    ports:
+      - "5601:5601"
